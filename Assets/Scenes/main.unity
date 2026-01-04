@@ -5979,6 +5979,67 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.22694162, y: 0.32201102, z: 0.06500774}
   m_Center: {x: -0.00000047683716, y: 0.16272469, z: -0.0000000074505815}
+--- !u!1001 &2052445827
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -9.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.37
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5749971232610121501, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8432513749828372052, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607166879007393202, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
+      propertyPath: m_Name
+      value: EnergyPickupParticles
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0fbed1953e58dba4387ad5176db01b9e, type: 3}
 --- !u!1 &2063761604
 GameObject:
   m_ObjectHideFlags: 0
@@ -6810,3 +6871,4 @@ SceneRoots:
   - {fileID: 1084025942}
   - {fileID: 1478373189}
   - {fileID: 516880396}
+  - {fileID: 2052445827}
