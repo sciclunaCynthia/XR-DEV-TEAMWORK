@@ -18,6 +18,8 @@ public class EnemyMover : MonoBehaviour
 
         // Prevent physics tipping/launching
         _rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+        
     }
 
     public void Init(WaypointPath path)
@@ -50,6 +52,7 @@ public class EnemyMover : MonoBehaviour
             target = _path.Get(_index);
             toTarget = target.position - transform.position;
         }
+        
 
         Vector3 step = toTarget.normalized * speed * Time.fixedDeltaTime;
         _rb.MovePosition(transform.position + step);
