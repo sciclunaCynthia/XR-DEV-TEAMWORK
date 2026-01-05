@@ -75,8 +75,12 @@ public class WaveManager : MonoBehaviour
 
             // Spawn each enemy slightly behind the previous one to avoid stacking
             Vector3 spawnPos = wp0.position - dir * spacing * i;
-            Quaternion spawnRot = wp0.rotation;
+            if (Physics.Raycast(spawnPos + Vector3.up, Vector3.down, out RaycastHit hit, 5f))
+            {
+                spawnPos.y = hit.point.y;
+            }
 
+            Quaternion spawnRot = wp0.rotation;
             GameObject enemy = Instantiate(enemyPrefab, spawnPos, spawnRot);
 
             var mover = enemy.GetComponent<EnemyMover>();

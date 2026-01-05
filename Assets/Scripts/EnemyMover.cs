@@ -14,12 +14,19 @@ public class EnemyMover : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _rb.useGravity = false;
-        _rb.isKinematic = false;
+        _rb.isKinematic = true;
 
         // Prevent physics tipping/launching
         _rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
-        
+        Physics.IgnoreLayerCollision(
+            LayerMask.NameToLayer("Enemy"),
+            LayerMask.NameToLayer("Enemy")
+        );
+
+
+
+
     }
 
     public void Init(WaypointPath path)
@@ -45,6 +52,10 @@ public class EnemyMover : MonoBehaviour
             _index++;
             if (_index >= _path.Count)
             {
+                _rb.linearVelocity = Vector3.zero;
+                _rb.angularVelocity = Vector3.zero;
+                _rb.isKinematic = true;
+
                 Destroy(gameObject);
                 return;
             }
@@ -52,13 +63,25 @@ public class EnemyMover : MonoBehaviour
             target = _path.Get(_index);
             toTarget = target.position - transform.position;
         }
-        
 
+        // Move along path
         Vector3 step = toTarget.normalized * speed * Time.fixedDeltaTime;
+        
+        Vector3 newPos = transform.position + step;
+        // Snap to ground
+        if (Physics.Raycast(transform.position + step + Vector3.up, Vector3.down, out RaycastHit hit, 5f))
+        {
+            newPos.y = hit.point.y;
+        }
+
         _rb.MovePosition(transform.position + step);
 
-        // Optional facing
-        if (toTarget.sqrMagnitude > 0.001f)
-            transform.forward = Vector3.Lerp(transform.forward, toTarget.normalized, 0.15f);
+        // Keep upright while facing forward
+        Vector3 forwardFlat = new Vector3(toTarget.x, 0, toTarget.z).normalized;
+        if (forwardFlat.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(forwardFlat, Vector3.up);
+            _rb.MoveRotation(Quaternion.Slerp(_rb.rotation, targetRot, 0.15f));
+        }
     }
 }

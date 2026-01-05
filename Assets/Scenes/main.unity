@@ -1337,7 +1337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f628e0dfdd23b0e43938b63cf5fc9f4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 5241769120412245720, guid: 4967b2cb0032f234ebf51b6a08280438, type: 3}
+  enemyPrefab: {fileID: 1198350659843962431, guid: 01f41758e29e1174a878c3270b945d87, type: 3}
   lanes:
   - {fileID: 1084025943}
   enemiesPerWave: 1
@@ -6300,7 +6300,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 29f3a4df41665fb44b9ea2a5ac0e9274, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.747
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 29f3a4df41665fb44b9ea2a5ac0e9274, type: 3}
       propertyPath: m_LocalPosition.z
