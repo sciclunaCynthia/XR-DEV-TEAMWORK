@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class WaveManager : MonoBehaviour
 {
+    // Turret (and anything else) can listen to this to start when waves begin
+    public static event System.Action OnWavesStarted;
+
     [Header("Setup")]
     public GameObject enemyPrefab;
     public List<WaypointPath> lanes = new();
@@ -25,6 +28,9 @@ public class WaveManager : MonoBehaviour
 
         if (_running) return;
         _running = true;
+
+        // Notify listeners (e.g., Turret) that waves have started
+        OnWavesStarted?.Invoke();
 
         StartCoroutine(WaveLoop());
     }
@@ -75,6 +81,8 @@ public class WaveManager : MonoBehaviour
 
             // Spawn each enemy slightly behind the previous one to avoid stacking
             Vector3 spawnPos = wp0.position - dir * spacing * i;
+
+            // Optional ground snap
             if (Physics.Raycast(spawnPos + Vector3.up, Vector3.down, out RaycastHit hit, 5f))
             {
                 spawnPos.y = hit.point.y;

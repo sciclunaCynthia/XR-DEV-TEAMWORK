@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    public float maxHp = 20f;
+    public float maxHp = 50f;
     private float hp;
 
     private void Awake() => hp = maxHp;
