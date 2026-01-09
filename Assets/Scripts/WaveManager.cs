@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class WaveManager : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class WaveManager : MonoBehaviour
         {
             _wave++;
             Debug.Log($"Wave {_wave} Incoming!");
+            UIManager.Instance.UpdateWaveText();
 
             yield return SpawnWave(enemiesPerWave);
 
