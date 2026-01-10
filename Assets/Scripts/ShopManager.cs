@@ -2,17 +2,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 public class ShopManager : MonoBehaviour
 {
-    public enum ItemType { None, Bomb }
+    public enum ItemType { None, Bomb, Cactus }
 
     [Header("Currency")]
     public int energy = 50;
 
     [Header("Costs")]
     public int bombCost = 10;
+    public int cactusCost = 15;
 
     [Header("UI References")]
     public TMP_Text energyText;
@@ -20,19 +20,18 @@ public class ShopManager : MonoBehaviour
 
     [Header("Item Prefabs")]
     public GameObject bombPrefab;
+    public GameObject cactusPrefab;
 
-    [Header("Spawn / Equip")]
-    public Transform handSocket;
+    [Header("Spawn Settings")]
+    [Tooltip("How far in front of the player's view the item spawns (meters). 0.6–1.0 is typical.")]
+    public float spawnDistance = 0.75f;
 
-    [Tooltip("The hand interactor that should auto-grab the spawned bomb (usually RightHand XR Direct Interactor).")]
-    public XRBaseInteractor handInteractor;
-
-    [Tooltip("Your scene's XR Interaction Manager.")]
-    public XRInteractionManager interactionManager;
+    [Tooltip("Optional: raise/lower spawn slightly relative to camera (meters).")]
+    public float spawnHeightOffset = -0.10f;
 
     public ItemType Equipped { get; private set; } = ItemType.None;
 
-    private GameObject currentHeldItem;
+    private GameObject currentSpawnedItem;
 
     private void Start()
     {
@@ -47,8 +46,6 @@ public class ShopManager : MonoBehaviour
 
     private bool TrySpend(int cost)
     {
-        Debug.Log($"[ShopManager] TrySpend called. energy={energy}, cost={cost}", this);
-
         if (energy < cost)
         {
             Debug.Log("Not enough Energy!", this);
@@ -59,99 +56,59 @@ public class ShopManager : MonoBehaviour
         return true;
     }
 
-    private void EquipItem(GameObject prefab, ItemType type)
+    private void SpawnItemInFrontOfPlayer(GameObject prefab, ItemType type)
     {
         if (prefab == null)
         {
-            Debug.LogError($"EquipItem failed: prefab for {type} is not assigned.", this);
+            Debug.LogError($"Spawn failed: prefab for {type} is not assigned.", this);
             return;
         }
 
-        if (handSocket == null)
+        Camera cam = Camera.main;
+        if (cam == null)
         {
-            Debug.LogError("EquipItem failed: handSocket is not assigned.", this);
+            Debug.LogError("Spawn failed: Camera.main is null. Make sure your XR camera is tagged MainCamera.", this);
             return;
         }
 
-        if (handInteractor == null)
+        // One-at-a-time behavior (optional, but keeps it simple)
+        if (currentSpawnedItem != null)
         {
-            Debug.LogError("EquipItem failed: handInteractor is not assigned (XR Direct Interactor).", this);
-            return;
+            Destroy(currentSpawnedItem);
+            currentSpawnedItem = null;
         }
 
-        if (interactionManager == null)
-        {
-            Debug.LogError("EquipItem failed: interactionManager is not assigned.", this);
-            return;
-        }
+        // Use flattened forward so it spawns in front on the horizontal plane (prevents spawning upward/downward)
+        Vector3 forwardFlat = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
+        if (forwardFlat.sqrMagnitude < 0.0001f) forwardFlat = cam.transform.forward;
 
-        // If we already have something "equipped", delete it (simple one-item-at-a-time behavior)
-        if (currentHeldItem != null)
-        {
-            Destroy(currentHeldItem);
-            currentHeldItem = null;
-        }
+        Vector3 spawnPos = cam.transform.position + forwardFlat * spawnDistance + Vector3.up * spawnHeightOffset;
+        Quaternion spawnRot = Quaternion.LookRotation(forwardFlat, Vector3.up);
 
-        // Spawn the item at the hand socket position/rotation.
-        // IMPORTANT: do NOT parent it to the hand. XR Grab will handle attachment.
-        GameObject spawned = Instantiate(prefab, handSocket.position, handSocket.rotation);
+        GameObject spawned = Instantiate(prefab, spawnPos, spawnRot);
 
-        // Ensure it's grabbable
-        XRGrabInteractable grab = spawned.GetComponent<XRGrabInteractable>();
-        if (grab == null)
-        {
-            Debug.LogError("Spawned item has no XRGrabInteractable. Add it to the prefab.", spawned);
-            Destroy(spawned);
-            return;
-        }
+        // Optional checks so it's grabbable/throwable
+        if (spawned.GetComponent<XRGrabInteractable>() == null)
+            Debug.LogWarning($"Spawned {type} has no XRGrabInteractable (won't be grabbable).", spawned);
 
-        // Ensure it has physics
-        Rigidbody rb = spawned.GetComponent<Rigidbody>();
-        if (rb == null)
-        {
-            Debug.LogError("Spawned item has no Rigidbody. Add it to the prefab.", spawned);
-            Destroy(spawned);
-            return;
-        }
+        if (spawned.GetComponent<Rigidbody>() == null)
+            Debug.LogWarning($"Spawned {type} has no Rigidbody (won't be throwable).", spawned);
 
-        // Make sure physics is active (so when released it can drop/throw)
-        rb.isKinematic = false;
-        rb.useGravity = true;
-
-        // --- FIX: Use new interface-based SelectEnter overload ---
-        IXRSelectInteractor selectInteractor = handInteractor as IXRSelectInteractor;
-        IXRSelectInteractable selectInteractable = grab as IXRSelectInteractable;
-
-        if (selectInteractor == null)
-        {
-            Debug.LogError("handInteractor does not implement IXRSelectInteractor. Assign an XR Direct Interactor component.", this);
-            Destroy(spawned);
-            return;
-        }
-
-        if (selectInteractable == null)
-        {
-            Debug.LogError("XRGrabInteractable does not implement IXRSelectInteractable (unexpected).", spawned);
-            Destroy(spawned);
-            return;
-        }
-
-        interactionManager.SelectEnter(selectInteractor, selectInteractable);
-        // --- end fix ---
-
-        currentHeldItem = spawned;
+        currentSpawnedItem = spawned;
         Equipped = type;
-
-        Debug.Log($"Equipped: {type}", this);
         RefreshUI();
     }
 
-    // --- Button hook ---
+    // --- Button hooks ---
     public void BuyBomb()
     {
         if (!TrySpend(bombCost)) return;
+        SpawnItemInFrontOfPlayer(bombPrefab, ItemType.Bomb);
+    }
 
-        Debug.Log("Bought: Bomb", this);
-        EquipItem(bombPrefab, ItemType.Bomb);
+    public void BuyCactus()
+    {
+        if (!TrySpend(cactusCost)) return;
+        SpawnItemInFrontOfPlayer(cactusPrefab, ItemType.Cactus);
     }
 }
