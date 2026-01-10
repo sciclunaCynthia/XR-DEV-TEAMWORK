@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour
     public float damage = 2f;
     public float lifeTime = 3f;
     public LayerMask enemyLayers;
+    //public AudioClip bulletHitSound;
 
     private Rigidbody rb;
 
@@ -40,7 +41,8 @@ public class Bullet : MonoBehaviour
         var hp = other.GetComponentInParent<EnemyHealth>();
         if (hp != null)
             hp.TakeDamage(damage);
-
+        //AudioSource.PlayClipAtPoint(bulletHitSound, transform.position);
         Destroy(gameObject);
+
     }
 }

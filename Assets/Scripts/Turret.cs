@@ -45,7 +45,7 @@ public class Turret : MonoBehaviour
 
         // Rotate towards target
         Vector3 dir = target.position - transform.position;
-        dir.y = 0f; // keep level (optional)
+        dir.y = 0f; 
 
         if (dir.sqrMagnitude > 0.001f)
         {

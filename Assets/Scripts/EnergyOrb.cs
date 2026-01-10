@@ -20,7 +20,7 @@ public class EnergyOrb : MonoBehaviour
     private void OnGrab(SelectEnterEventArgs args)
     {
         AudioSource.PlayClipAtPoint(pickupSound, transform.position);
-        //Instantiate(pickupParticles, transform.position, Quaternion.identity);
+        
 
         GameObject particles = Instantiate(
             pickupParticles,
@@ -31,8 +31,7 @@ public class EnergyOrb : MonoBehaviour
         ParticleSystem ps = particles.GetComponent<ParticleSystem>();
         ps.Play();
 
-        Destroy(particles, 2f); //particles finish before orb is destroyed 
-
+        Destroy(particles, 2f); 
         ResourceManager.Instance.AddEnergy(energyValue);
         Destroy(gameObject, 0.05f);
 
