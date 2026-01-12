@@ -3,60 +3,95 @@ using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(XRGrabInteractable))]
 public class Bomb : MonoBehaviour
 {
-
     [Header("Impact Layers")]
-   
     public LayerMask groundLayers;
+
     [Header("Explosion")]
     public float radius = 2.5f;
     public float damage = 10f;
     public LayerMask enemyLayers;
 
     [Header("Impact")]
-    public bool explodeOnAnyCollision = false;
-    public float minImpactSpeed = 0.5f;        
+    [Tooltip("Minimum impact speed required to explode (meters/sec).")]
+    public float minImpactSpeed = 0.5f;
+
+    [Header("Arming")]
+    [Tooltip("Bomb will ONLY explode after it has been released by the player at least once.")]
+    public bool requireReleaseToArm = true;
+
+    [Tooltip("Optional: require at least this release speed to count as 'thrown'. Set to 0 to arm on any release (drop OR throw).")]
+    public float minReleaseSpeedToArm = 0.0f;
 
     [Header("VFX")]
-    public ParticleSystem explosionVfxPrefab;  
-    public float vfxLifetime = 2f;             
+    public ParticleSystem explosionVfxPrefab;
+    public float vfxLifetime = 2f;
 
     private bool exploded;
     private Rigidbody rb;
+    private XRGrabInteractable grab;
+
+    // This is the key state:
+    private bool armed = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        grab = GetComponent<XRGrabInteractable>();
     }
 
-    XRGrabInteractable grab;
-    void Start()
+    private void OnEnable()
     {
-        grab = GetComponent<XRGrabInteractable>();
-        grab.selectEntered.AddListener(_ => rb.isKinematic = true);
-        grab.selectExited.AddListener(_ => rb.isKinematic = false);
+        // When grabbed: disarm (prevents exploding while being held / before any throw)
+        grab.selectEntered.AddListener(OnGrabbed);
+        // When released: arm (only if released fast enough)
+        grab.selectExited.AddListener(OnReleased);
     }
+
+    private void OnDisable()
+    {
+        grab.selectEntered.RemoveListener(OnGrabbed);
+        grab.selectExited.RemoveListener(OnReleased);
+    }
+
+    private void OnGrabbed(SelectEnterEventArgs args)
+    {
+        // Reset arming when picked up
+        armed = false;
+    }
+
+    private void OnReleased(SelectExitEventArgs args)
+    {
+        if (!requireReleaseToArm)
+        {
+            armed = true;
+            return;
+        }
+
+        // Arm only if release speed is high enough
+        float releaseSpeed = rb.linearVelocity.magnitude;
+        if (releaseSpeed >= minReleaseSpeedToArm)
+            armed = true;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (exploded) return;
 
-        
+        // Only explode after release/throw
+        if (requireReleaseToArm && !armed) return;
+
+        // Only explode on GROUND contact
+        int hitLayerMask = 1 << collision.gameObject.layer;
+        bool hitGround = (groundLayers.value & hitLayerMask) != 0;
+        if (!hitGround) return;
+
         float impactSpeed = collision.relativeVelocity.magnitude;
         if (impactSpeed < minImpactSpeed) return;
 
-        int hitLayerMask = 1 << collision.gameObject.layer;
-        if (!explodeOnAnyCollision)
-        {
-
-            bool hitEnemy = (enemyLayers.value & hitLayerMask) != 0;
-            bool hitGround = (groundLayers.value & hitLayerMask) != 0;
-
-            if (!hitEnemy && !hitGround)
-                return;
-        }
-
-        Debug.Log($"Bomb hit: {collision.gameObject.name} (speed {impactSpeed:F2}) -> EXPLODE");
+        Debug.Log($"Bomb hit ground: {collision.gameObject.name} (speed {impactSpeed:F2}) -> EXPLODE");
         Explode();
     }
 
@@ -64,7 +99,6 @@ public class Bomb : MonoBehaviour
     {
         exploded = true;
 
-        
         if (explosionVfxPrefab != null)
         {
             ParticleSystem vfx = Instantiate(explosionVfxPrefab, transform.position, Quaternion.identity);
