@@ -1,21 +1,26 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Bomb : MonoBehaviour
 {
+
+    [Header("Impact Layers")]
+   
+    public LayerMask groundLayers;
     [Header("Explosion")]
     public float radius = 2.5f;
     public float damage = 10f;
     public LayerMask enemyLayers;
 
     [Header("Impact")]
-    public bool explodeOnAnyCollision = false; // if false: only explodes when it hits an enemy
-    public float minImpactSpeed = 0.5f;        // prevents tiny bumps from exploding
+    public bool explodeOnAnyCollision = false;
+    public float minImpactSpeed = 0.5f;        
 
     [Header("VFX")]
-    public ParticleSystem explosionVfxPrefab;  // drag your particle prefab here
-    public float vfxLifetime = 2f;             // how long until the spawned VFX is destroyed
+    public ParticleSystem explosionVfxPrefab;  
+    public float vfxLifetime = 2f;             
 
     private bool exploded;
     private Rigidbody rb;
@@ -25,19 +30,29 @@ public class Bomb : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
+    XRGrabInteractable grab;
+    void Start()
+    {
+        grab = GetComponent<XRGrabInteractable>();
+        grab.selectEntered.AddListener(_ => rb.isKinematic = true);
+        grab.selectExited.AddListener(_ => rb.isKinematic = false);
+    }
     private void OnCollisionEnter(Collision collision)
     {
         if (exploded) return;
 
-        // Optional: ignore super-slow impacts
+        
         float impactSpeed = collision.relativeVelocity.magnitude;
         if (impactSpeed < minImpactSpeed) return;
 
-        // If we only want to explode when hitting an enemy:
+        int hitLayerMask = 1 << collision.gameObject.layer;
         if (!explodeOnAnyCollision)
         {
-            // Check if the object we hit is on the enemy layer mask
-            if (((1 << collision.gameObject.layer) & enemyLayers.value) == 0)
+
+            bool hitEnemy = (enemyLayers.value & hitLayerMask) != 0;
+            bool hitGround = (groundLayers.value & hitLayerMask) != 0;
+
+            if (!hitEnemy && !hitGround)
                 return;
         }
 
@@ -49,7 +64,7 @@ public class Bomb : MonoBehaviour
     {
         exploded = true;
 
-        // Spawn explosion VFX at the bomb position BEFORE destroying the bomb
+        
         if (explosionVfxPrefab != null)
         {
             ParticleSystem vfx = Instantiate(explosionVfxPrefab, transform.position, Quaternion.identity);
