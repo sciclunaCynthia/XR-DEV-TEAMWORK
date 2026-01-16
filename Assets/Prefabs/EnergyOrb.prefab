@@ -277,6 +277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3db15e49b190a84a963d4502832f087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  energyValue: 1
+  energyValue: 50
   pickupSound: {fileID: 8300000, guid: ba39bf8baf6d13046889b2d64822381a, type: 3}
   pickupParticles: {fileID: 0}

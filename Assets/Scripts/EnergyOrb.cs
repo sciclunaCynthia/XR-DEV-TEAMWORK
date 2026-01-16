@@ -6,19 +6,25 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 public class EnergyOrb : MonoBehaviour
 {
-    public int energyValue = 50;
+    private static int energyValue = 10;
     private XRGrabInteractable grab;
     public AudioClip pickupSound;
     public GameObject pickupParticles;
+
 
     void Awake()
     {
         grab = GetComponent<XRGrabInteractable>();
         grab.selectEntered.AddListener(OnGrab);
+
     }
 
     private void OnGrab(SelectEnterEventArgs args)
     {
+
+        Debug.Log("Energy has been picked up! Total energy is now: " + ResourceManager.Instance.energy);
+
+
         AudioSource.PlayClipAtPoint(pickupSound, transform.position);
         
 

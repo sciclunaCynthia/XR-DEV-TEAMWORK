@@ -5,6 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class ShopManager : MonoBehaviour
 {
+
     public enum ItemType { None, Bomb, Cactus }
 
     //[Header("Currency")]
@@ -35,23 +36,31 @@ public class ShopManager : MonoBehaviour
 
     private void Start()
     {
-        RefreshUI();
+        RefreshEnergyText();
+        RefreshEquippedText();
     }
 
-    private void RefreshUI()
+    private void Update()
+    {
+        RefreshEnergyText();
+    }
+
+    public void RefreshEnergyText()
     {
         if (energyText)
             energyText.text = $"Energy: {ResourceManager.Instance.energy}";
+    }
 
+    private void RefreshEquippedText()
+    {
         if (equippedText)
             equippedText.text = $"Equipped: {Equipped}";
-
-
     }
 
     private void OnEnable()
     {
-        RefreshUI();
+        RefreshEnergyText();
+        RefreshEquippedText ();
     }
 
 
@@ -107,7 +116,8 @@ public class ShopManager : MonoBehaviour
 
         currentSpawnedItem = spawned;
         Equipped = type;
-        RefreshUI();
+        RefreshEnergyText();
+        RefreshEquippedText();
     }
 
     // --- Button hooks ---
