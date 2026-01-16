@@ -252,14 +252,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   radius: 2.5
-  damage: 10
+  damage: 30
   enemyLayers:
     serializedVersion: 2
     m_Bits: 64
   minImpactSpeed: 0.5
   requireReleaseToArm: 1
   minReleaseSpeedToArm: 1
-  explosionVfxPrefab: {fileID: 8432513749828372052, guid: e46557cf6e9cea545ac5cbd18447f43c, type: 3}
+  explosionVfxPrefab: {fileID: 7850789876541872091, guid: 82c4f30eaace5674db680d8206220ad8, type: 3}
   vfxLifetime: 2
 --- !u!1 &6023594667723694139
 GameObject:

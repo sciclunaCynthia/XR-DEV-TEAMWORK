@@ -226,5 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a5471c4e1129d748a6fbf6557db3a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletHitSound: {fileID: 8300000, guid: 95640a523ff9a9648b57a7ba1249ee44, type: 3}
   maxHp: 50
+  bulletHitSound: {fileID: 8300000, guid: 95640a523ff9a9648b57a7ba1249ee44, type: 3}
+  energyOrbPrefab: {fileID: 1810398220422317837, guid: 6eefc1cae133f994a90c0493ae9ef0d4, type: 3}
+  dropHeightOffset: 0.5
