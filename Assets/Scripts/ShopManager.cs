@@ -7,8 +7,8 @@ public class ShopManager : MonoBehaviour
 {
     public enum ItemType { None, Bomb, Cactus }
 
-    [Header("Currency")]
-    public int energy = 50;
+    //[Header("Currency")]
+    //public int energy = 50;
 
     [Header("Costs")]
     public int bombCost = 10;
@@ -40,21 +40,32 @@ public class ShopManager : MonoBehaviour
 
     private void RefreshUI()
     {
-        if (energyText) energyText.text = $"Energy: {energy}";
-        if (equippedText) equippedText.text = $"Equipped: {Equipped}";
+        if (energyText)
+            energyText.text = $"Energy: {ResourceManager.Instance.energy}";
+
+        if (equippedText)
+            equippedText.text = $"Equipped: {Equipped}";
+
+
     }
+
+    private void OnEnable()
+    {
+        RefreshUI();
+    }
+
 
     private bool TrySpend(int cost)
     {
-        if (energy < cost)
+        if (!ResourceManager.Instance.SpendEnergy(cost))
         {
             Debug.Log("Not enough Energy!", this);
             return false;
         }
 
-        energy -= cost;
         return true;
     }
+
 
     private void SpawnItemInFrontOfPlayer(GameObject prefab, ItemType type)
     {

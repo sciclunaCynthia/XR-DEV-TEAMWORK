@@ -6,7 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 public class EnergyOrb : MonoBehaviour
 {
-    public int energyValue = 10;
+    public int energyValue = 50;
     private XRGrabInteractable grab;
     public AudioClip pickupSound;
     public GameObject pickupParticles;
